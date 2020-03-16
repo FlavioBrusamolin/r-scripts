@@ -1,7 +1,6 @@
 #Question 1
 var1 = 50;
 var2 = 12;
-
 result = var1 %% var2
 result
 
@@ -23,20 +22,21 @@ list1
 
 #Question 6
 names = c("Leonardo", "Flavio", "Bruno", "Danilo")
-ages = c(22, 2, 21, 22)
+ages = c(22, 21, 21, 22)
 name_x_age = cbind(names, ages)
 
 #Question 7
-iris
-str(iris)
+View(iris)
+dim(iris)
+summary(iris)
 
 #Question 8
-getwd()
-table = read.table("effort.dat", TRUE, sep=",", quote="\"")
+path = file.path(getwd(), "effort.dat")
+table = read.table(path)
 
 #Question 9
-table = read.table("effort.dat", TRUE, sep=",", quote="\"")
-new_dataframe = table
-names(new_dataframe)[1] <- "Configuração Esforço Mudança"
+colnames(table) <- c("Configuração", "Esforço", "Mudança")
 
 #Question 10
+dataframe = subset(iris, Sepal.Length > 7)
+dataframe
