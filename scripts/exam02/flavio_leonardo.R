@@ -28,7 +28,6 @@ install.packages('rvest')
 library(rvest)
 
 library(stringr)
-library(dplyr)
 library(lubridate)
 library(readr)
 
@@ -40,14 +39,23 @@ pagina1
 
 previsao <- pagina1 %>% 
   html_nodes("#detailed-forecast-body") %>% 
-  html_nodes(".forecast-text") %>% 
-  html_text()
+  html_nodes(".forecast-text")
 
 previsao
 
 # Questao 3) Transforme o resultado da questao anterior, objeto previsao (documento xml)
 # em um objeto texto. Coloque espacos nele com a funcao paste para que ele fique legivel.
 
+install.packages("dplyr")
+library(dplyr)
+
+tags <- vector("list", length = length(previsao))
+
+for (i in seq_along(tags)) {
+  tags[i] <- previsao[i] %>% html_text(trim = TRUE)
+}
+
+paste(tags, collapse = "")
 
 # Questao 4) Pesquisa sobre idade (em meses) e tempo de reacao de um 
 # material radioativo (em horas):
@@ -81,18 +89,28 @@ ggplot(pesquisa, aes(x = idade, y = tempo)) +
 alturas = c(176, 154, 138, 196, 132, 176, 181, 169, 150, 175)
 pesos = c(82, 49, 53, 112, 47, 69, 77, 71, 62, 78)
 
+df <- data.frame(alturas, pesos)
+
 # 5.a) Crie o modelo de regressao para esta relacao. A variavel alvo eh pesos.
+
+modelo <- lm(pesos ~ alturas, data = df)
+summary(modelo)
 
 # 5.b) Esse modelo criado apresentou bastante acuracia (ou seja ele apresentou uma
 # boa previsao)? Se sim ou não, justifique sua resposta!
 
+# Sim, o Multiple R-squared apresentou um valor alto: 0.8126
 
 # 5.c) Faca a previsao de pesos com base neste novo conjunto de
 # de alturas (alturas2), utilizando o modelo preditivo gerado em 5a):
 alturas2 = data.frame(c(179, 152, 134, 197, 131, 178, 185, 162, 155, 172))
 
+previsao <- predict(modelo, alturas2)
+View(previsao)
+
 # 5.d) Qual o valor de peso previsto para a altura 197cm?
 
+predict(modelo, data.frame(alturas = c(197)))
 
 # Questao 6) Regressao Linear - Voces terao que contruir um modelo de machine
 # learning para um problema de regressao com os seus 5 passos :
@@ -111,33 +129,38 @@ alturas2 = data.frame(c(179, 152, 134, 197, 131, 178, 185, 162, 155, 172))
 # Etapa 6.2) Carregue, no objeto df, o dataset 'estudantes.csv' disponibilizado junto
 #            com esta avaliacao e visualize seus dados.
 
+df <- read.csv("estudantes.csv", sep = ";")
+View(df)
+
 # 6.2.a) Quais foram os tipos gerados para as variaveis deste dataframe?
 
+str(df)
 
 # 6.2.b) Gere um histograma para a variavel G3 para voce ver a frequencia.
 
+hist(df$G3, main = "Histograma G3")
 
 # Etapa 6.3) Construa e treine o modelo (versao 1) utilizando os 2 atributos: G1 e G2,
 #            como variaveis preditoras e o G3, como variavel target e utilize o
 #            o arquivo de treino gerado abaixo para fazer esta construcao do modelo:
 treino <- df[1:275,]  # com aproximadamente 70% dos registros de estudantes.csv
 
+modelo <- lm(G3 ~ G1 + G2, data = treino)
 
 # Etapa 6.4) Avalie e interprete o modelo criado. Ele apresentou uma boa previsao? Justifique!
 
+summary(modelo)
+# Sim, o Multiple R-squared apresentou um valor de: 0.8222
 
 # Etapa 6.5) Realize uma otimizacao desse modelo, criando uma versao 2 dele. Seja criativo!
 #            O que você fez nesta otimizacao? Ela apresentou melhor previsao do que o modelo
 #            anterior? Justifique!
 
+modelo2 <- lm(G3 ~ G1 + G2 + studytime + paid + reason + internet, data = treino)
+summary(modelo2)
+
 # 6.6) Faca a previsao solicitada na Etapa 6.1 com esta 2a. versao do modelo, utilizando o 
 #      arquivo de teste gerado abaixo para fazer a previsao no modelo (com a versao 2):
 teste <- df[276:395,]  # com aproximadamente 30% dos registros de estudantes.csv
 
-
-
-
-
-
-
-
+View(predict(modelo2, teste))
